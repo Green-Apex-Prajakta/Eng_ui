@@ -13,11 +13,13 @@ class UsersController < ApplicationController
     render json: @user
   end
 
+  
   def search
-    q = params[:q].downcase
-    @search= User.where("first_name LIKE '%#{q}%' OR last_name LIKE '%#{q}%' OR email LIKE '%#{q}%'")
+    search_typehead = params[:q]
+    @search = User.any_of({first_name: /#{search_typehead}/}, {last_name: /#{search_typehead}/}, {email: /#{search_typehead}/})
     render json: @search
   end
+
 
   # POST /users
   def create
@@ -34,7 +36,7 @@ class UsersController < ApplicationController
   def update
     if @user.update(user_params)
       render json: @user
-    else
+    else 
       render json: @user.errors, status: :unprocessable_entity
     end
   end
